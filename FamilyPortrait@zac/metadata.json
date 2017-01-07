@@ -1,0 +1,9 @@
+{
+	"uuid": "FamilyPortrait@zac",
+	"name": "Family Portrait",
+	"description": "Show images on your desktop",
+	"icon": "users",
+	"prevent-decorations": false,
+	"max-instances": "100",
+	"dangerous": false
+}
