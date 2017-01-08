@@ -3,6 +3,8 @@
 	"name": "Family Portrait",
 	"description": "Show images on your desktop",
 	"icon": "users",
+	"website": "https://github.com/Zac610/CinnamonMediaDesklets",
+	"contributors": "Sergio Lo Cascio",
 	"prevent-decorations": false,
 	"max-instances": "100",
 	"dangerous": false
