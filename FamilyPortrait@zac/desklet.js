@@ -4,8 +4,12 @@ const Clutter = imports.gi.Clutter;
 const Util = imports.misc.util;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const Lang = imports.lang;
+const Signals = imports.signals;
+const Cinnamon = imports.gi.Cinnamon;
 
 const DEFAULT_WIDTH = 100;
+const BORDER_RESIZE = 10;
 
 function VideoDesk(metadata, desklet_id)
 {
@@ -51,16 +55,15 @@ VideoDesk.prototype =
 	{
 		Desklet.Desklet.prototype._init.call(this, metadata, desklet_id);
 
-		this.window = new St.Bin();
+		this.window = new St.Bin({reactive: true});
 
 		let imgFilename = getUserImagesDir() + '/image.jpg';
 		this._clutterTexture = new Clutter.Texture({keep_aspect_ratio: true});
 		this._clutterTexture.set_from_file(imgFilename)
 
-		this._clutterBox = new Clutter.Box();
+		this._clutterBox = new Clutter.Box({reactive: true});
 		this._binLayout = new Clutter.BinLayout();
 		this._clutterBox.set_layout_manager(this._binLayout);
-		//~ this._clutterBox.set_width(this.metadata["width"]);
 		this._clutterBox.set_width(DEFAULT_WIDTH);
 		this._clutterBox.add_actor(this._clutterTexture);
 
@@ -70,10 +73,45 @@ VideoDesk.prototype =
 		this._clutterBox.add_actor(this.text);
 
 		this.window.add_actor(this._clutterBox);
-		//~ global.set_user_resizable(true);
+
+		this.motionEventId = this.window.connect("motion-event", Lang.bind(this, this.onMotionEvent));
 
 		this.setContent(this.window);
+	},
+
+
+	onButtonPressEvent: function(actor, event)
+	{
+		let type = event.type();
+		this.text.set_text("type: "+ type);
+
+		return false;
+	},
+
+
+   onMotionEvent: function(actor, event)
+	{
+		let [mx, my] = event.get_coords();
+		let [ret, px, py] = actor.transform_stage_point(mx, my);
+		if (px > actor.width - BORDER_RESIZE && py > actor.height - BORDER_RESIZE)
+		{
+			global.set_cursor(Cinnamon.Cursor.DND_MOVE);
+			this._cursorChanged = true;
+			this.text.set_text("resize");
+		}
+		else
+		{
+			global.unset_cursor();
+			this._cursorChanged = false;
+			this.text.set_text("normal");
+		}
+   },
+
+	on_desklet_removed: function()
+	{
+		this.window.disconnect(this.motionEventId);
 	}
+
 }
 
 
