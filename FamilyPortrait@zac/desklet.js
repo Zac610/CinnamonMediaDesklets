@@ -9,7 +9,9 @@ const Signals = imports.signals;
 const Cinnamon = imports.gi.Cinnamon;
 
 const DEFAULT_WIDTH = 100;
-const BORDER_RESIZE = 10;
+const DEFAULT_HEIGHT = 200;
+const BORDER_RESIZE = 20;
+const KEEP_RATIO = false;
 
 function VideoDesk(metadata, desklet_id)
 {
@@ -58,23 +60,29 @@ VideoDesk.prototype =
 		this.window = new St.Bin({reactive: true});
 
 		let imgFilename = getUserImagesDir() + '/image.jpg';
-		this._clutterTexture = new Clutter.Texture({keep_aspect_ratio: true});
+		this._clutterTexture = new Clutter.Texture({keep_aspect_ratio: KEEP_RATIO});
 		this._clutterTexture.set_from_file(imgFilename)
 
-		this._clutterBox = new Clutter.Box({reactive: true});
+		this._clutterBox = new Clutter.Box();
 		this._binLayout = new Clutter.BinLayout();
 		this._clutterBox.set_layout_manager(this._binLayout);
 		this._clutterBox.set_width(DEFAULT_WIDTH);
+		this._clutterBox.set_height(DEFAULT_HEIGHT);
 		this._clutterBox.add_actor(this._clutterTexture);
 
 		// Aggiunge un testo se serve
 		this.text = new St.Label();
-		this.text.set_text("desklet id: "+ desklet_id);
+		//~ this.text.set_text("desklet id: "+ desklet_id);
 		this._clutterBox.add_actor(this.text);
 
 		this.window.add_actor(this._clutterBox);
 
+		this._resizeAllowed = false;
 		this.motionEventId = this.window.connect("motion-event", Lang.bind(this, this.onMotionEvent));
+		this.leaveEventId = this.window.connect("leave-event", Lang.bind(this, this.onLeaveEvent));
+		this._resizeInProgress = false;
+		this.buttonPressEventId = this.window.connect("button-press-event", Lang.bind(this, this.onButtonPressEvent));
+		this.buttonReleaseEventId = this.window.connect("button-release-event", Lang.bind(this, this.onButtonReleaseEvent));
 
 		this.setContent(this.window);
 	},
@@ -82,34 +90,74 @@ VideoDesk.prototype =
 
 	onButtonPressEvent: function(actor, event)
 	{
-		let type = event.type();
-		this.text.set_text("type: "+ type);
-
-		return false;
+		if (this._resizeAllowed == true)
+		{
+			this._resizeInProgress = true;
+			return true;
+		}
+		else
+			return false;
 	},
 
 
-   onMotionEvent: function(actor, event)
+	onButtonReleaseEvent: function(actor, event)
+	{
+		if (this._resizeInProgress == true)
+		{
+			this._resizeInProgress = false;
+			return true;
+		}
+		else
+			return false;
+	},
+
+
+	onMotionEvent: function(actor, event)
 	{
 		let [mx, my] = event.get_coords();
 		let [ret, px, py] = actor.transform_stage_point(mx, my);
-		if (px > actor.width - BORDER_RESIZE && py > actor.height - BORDER_RESIZE)
+
+		if (this._resizeInProgress)
 		{
-			global.set_cursor(Cinnamon.Cursor.DND_MOVE);
-			this._cursorChanged = true;
-			this.text.set_text("resize");
+			this._clutterBox.width = px + BORDER_RESIZE;
+			this._clutterBox.height = py + BORDER_RESIZE;
 		}
 		else
 		{
-			global.unset_cursor();
-			this._cursorChanged = false;
-			this.text.set_text("normal");
+			if (px > actor.width - BORDER_RESIZE && py > actor.height - BORDER_RESIZE)
+			{
+				global.set_cursor(Cinnamon.Cursor.DND_MOVE);
+				this._cursorChanged = true;
+				this.text.set_text("resize");
+				this._resizeAllowed = true;
+			}
+			else
+			{
+				global.unset_cursor();
+				this._cursorChanged = false;
+				this.text.set_text("");
+				this._resizeAllowed = false;
+			}
 		}
-   },
+  },
+
+
+	onLeaveEvent: function(actor, event)
+	{
+		global.unset_cursor();
+		this._cursorChanged = false;
+		this.text.set_text("");
+		this._resizeAllowed = false;
+		this._resizeInProgress = false;
+	},
+
 
 	on_desklet_removed: function()
 	{
 		this.window.disconnect(this.motionEventId);
+		this.window.disconnect(this.leaveEventId);
+		this.window.disconnect(this.buttonPressEventId);
+		this.window.disconnect(this.buttonReleaseEventId);
 	}
 
 }
