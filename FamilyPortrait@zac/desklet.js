@@ -77,9 +77,7 @@ ZacDesklet.prototype =
 		this.onSettingGeometryChanged();
 		this._clutterBox.add_actor(this._clutterTexture);
 
-		// Aggiunge un testo se serve
 		this.text = new St.Label();
-		//~ this.text.set_text("desklet id: "+ desklet_id);
 		this._clutterBox.add_actor(this.text);
 
 		this.window.add_actor(this._clutterBox);
@@ -143,7 +141,8 @@ ZacDesklet.prototype =
 		}
 		else
 		{
-			if (px > actor.width - this.settingBorderResize && py > actor.height - this.settingBorderResize)
+			if (px > actor.width - this.settingBorderResize &&
+					py > actor.height - this.settingBorderResize)
 			{
 				global.set_cursor(Cinnamon.Cursor.DND_MOVE);
 				this._cursorChanged = true;

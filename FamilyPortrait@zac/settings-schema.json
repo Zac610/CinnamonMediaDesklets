@@ -1,0 +1,52 @@
+{
+	"header-general":
+	{
+		"type": "header",
+		"description": "Image Geometry"
+	},
+	"settingKeepRatio":
+	{
+		"default": false,
+		"description": "Keep original image ratio",
+		"type": "checkbox",
+		"tooltip": "Check this if you want to preserve the original image ratio"
+	},
+	"settingWidth":
+	{
+		"default": 200,
+		"type": "spinbutton",
+		"min": 10,
+		"max": 800,
+		"description": "Width",
+		"units": "pixels",
+		"step": 10,
+		"tooltip": "Image width"
+	},
+	"settingHeight":
+	{
+		"default": 200,
+		"type": "spinbutton",
+		"min": 10,
+		"max": 800,
+		"description": "Height",
+		"units": "pixels",
+		"step": 10,
+		"tooltip": "Image height"
+	},
+	"header-misc":
+	{
+		"type": "header",
+		"description": "General"
+	},
+	"settingBorderResize":
+	{
+		"default": 20,
+		"type": "spinbutton",
+		"min": 5,
+		"max": 100,
+		"description": "Size of resize box",
+		"units": "pixels",
+		"step": 2,
+		"tooltip": "Size of bottom-right square area sensible to mouse dragging"
+	}
+}
