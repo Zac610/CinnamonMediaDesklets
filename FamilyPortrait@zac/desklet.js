@@ -7,13 +7,10 @@ const GLib = imports.gi.GLib;
 const Lang = imports.lang;
 const Signals = imports.signals;
 const Cinnamon = imports.gi.Cinnamon;
+const Settings = imports.ui.settings;
 
-const DEFAULT_WIDTH = 100;
-const DEFAULT_HEIGHT = 200;
-const BORDER_RESIZE = 20;
-const KEEP_RATIO = false;
 
-function VideoDesk(metadata, desklet_id)
+function ZacDesklet(metadata, desklet_id)
 {
 	this._init(metadata, desklet_id);
 }
@@ -49,7 +46,7 @@ function getUserImagesDir() { // from fileUtils.js
 }
 
 
-VideoDesk.prototype =
+ZacDesklet.prototype =
 {
 	__proto__: Desklet.Desklet.prototype,
 
@@ -57,17 +54,27 @@ VideoDesk.prototype =
 	{
 		Desklet.Desklet.prototype._init.call(this, metadata, desklet_id);
 
+		this.settings = new Settings.DeskletSettings(this, "FamilyPortrait@zac", desklet_id);
+		this.settings.bindProperty(Settings.BindingDirection.IN, "settingKeepRatio", "settingKeepRatio",
+                           this.onSettingKeepRatioChanged, null);
+		this.settings.bindProperty(Settings.BindingDirection.IN, "settingWidth", "settingWidth",
+                           this.onSettingGeometryChanged, null);
+		this.settings.bindProperty(Settings.BindingDirection.IN, "settingHeight", "settingHeight",
+                           this.onSettingGeometryChanged, null);
+		this.settings.bindProperty(Settings.BindingDirection.IN, "settingBorderResize", "settingBorderResize",
+                           null, null);
+
 		this.window = new St.Bin({reactive: true});
 
 		let imgFilename = getUserImagesDir() + '/image.jpg';
-		this._clutterTexture = new Clutter.Texture({keep_aspect_ratio: KEEP_RATIO});
+		this._clutterTexture = new Clutter.Texture();
+		this.onSettingKeepRatioChanged();
 		this._clutterTexture.set_from_file(imgFilename)
 
 		this._clutterBox = new Clutter.Box();
 		this._binLayout = new Clutter.BinLayout();
 		this._clutterBox.set_layout_manager(this._binLayout);
-		this._clutterBox.set_width(DEFAULT_WIDTH);
-		this._clutterBox.set_height(DEFAULT_HEIGHT);
+		this.onSettingGeometryChanged();
 		this._clutterBox.add_actor(this._clutterTexture);
 
 		// Aggiunge un testo se serve
@@ -85,6 +92,18 @@ VideoDesk.prototype =
 		this.buttonReleaseEventId = this.window.connect("button-release-event", Lang.bind(this, this.onButtonReleaseEvent));
 
 		this.setContent(this.window);
+	},
+
+
+	onSettingGeometryChanged: function()
+	{
+		this._clutterBox.set_width(this.settingWidth);
+		this._clutterBox.set_height(this.settingHeight);
+	},
+
+	onSettingKeepRatioChanged: function()
+	{
+		this._clutterTexture.set_keep_aspect_ratio(this.settingKeepRatio);
 	},
 
 
@@ -119,12 +138,12 @@ VideoDesk.prototype =
 
 		if (this._resizeInProgress)
 		{
-			this._clutterBox.width = px + BORDER_RESIZE;
-			this._clutterBox.height = py + BORDER_RESIZE;
+			this._clutterBox.width = px + this.settingBorderResize;
+			this._clutterBox.height = py + this.settingBorderResize;
 		}
 		else
 		{
-			if (px > actor.width - BORDER_RESIZE && py > actor.height - BORDER_RESIZE)
+			if (px > actor.width - this.settingBorderResize && py > actor.height - this.settingBorderResize)
 			{
 				global.set_cursor(Cinnamon.Cursor.DND_MOVE);
 				this._cursorChanged = true;
@@ -165,5 +184,5 @@ VideoDesk.prototype =
 
 function main(metadata, desklet_id)
 {
-	return new VideoDesk(metadata, desklet_id);
+	return new ZacDesklet(metadata, desklet_id);
 }
