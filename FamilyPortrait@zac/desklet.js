@@ -55,6 +55,7 @@ ZacDesklet.prototype =
 		Desklet.Desklet.prototype._init.call(this, metadata, desklet_id);
 
 		this.settings = new Settings.DeskletSettings(this, metadata["uuid"], desklet_id);
+		this.settings.bind("settingImage", "settingImage", this.onSettingImageChanged);
 		this.settings.bind("settingKeepRatio", "settingKeepRatio", this.onSettingKeepRatioChanged);
 		this.settings.bind("settingWidth", "settingWidth", this.onSettingGeometryChanged);
 		this.settings.bind("settingHeight", "settingHeight", this.onSettingGeometryChanged);
@@ -62,10 +63,11 @@ ZacDesklet.prototype =
 
 		this.window = new St.Bin({reactive: true});
 
-		let imgFilename = getUserImagesDir() + '/image.jpg';
+		if (this.settingImage == "")
+			this.settingImage = getUserImagesDir() + '/image.jpg';
 		this._clutterTexture = new Clutter.Texture();
 		this.onSettingKeepRatioChanged();
-		this._clutterTexture.set_from_file(imgFilename)
+		this.onSettingImageChanged();
 
 		this._clutterBox = new Clutter.Box();
 		this._binLayout = new Clutter.BinLayout();
@@ -88,6 +90,11 @@ ZacDesklet.prototype =
 		this.setContent(this.window);
 	},
 
+
+	onSettingImageChanged: function()
+	{
+		this._clutterTexture.set_from_file(this.settingImage);
+	},
 
 	onSettingGeometryChanged: function()
 	{

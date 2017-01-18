@@ -4,6 +4,12 @@
 		"type": "header",
 		"description": "Image Geometry"
 	},
+	"settingImage":
+	{
+		"type": "iconfilechooser",
+		"description": "Image to display",
+		"default": ""
+	},
 	"settingKeepRatio":
 	{
 		"default": false,
