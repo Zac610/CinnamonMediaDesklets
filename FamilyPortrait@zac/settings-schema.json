@@ -12,7 +12,7 @@
 	},
 	"settingKeepRatio":
 	{
-		"default": false,
+		"default": true,
 		"description": "Keep original image ratio",
 		"type": "checkbox",
 		"tooltip": "Check this if you want to preserve the original image ratio"
@@ -46,7 +46,7 @@
 	},
 	"settingBorderResize":
 	{
-		"default": 20,
+		"default": 30,
 		"type": "spinbutton",
 		"min": 5,
 		"max": 100,
