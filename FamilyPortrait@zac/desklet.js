@@ -54,15 +54,11 @@ ZacDesklet.prototype =
 	{
 		Desklet.Desklet.prototype._init.call(this, metadata, desklet_id);
 
-		this.settings = new Settings.DeskletSettings(this, "FamilyPortrait@zac", desklet_id);
-		this.settings.bindProperty(Settings.BindingDirection.IN, "settingKeepRatio", "settingKeepRatio",
-                           this.onSettingKeepRatioChanged, null);
-		this.settings.bindProperty(Settings.BindingDirection.IN, "settingWidth", "settingWidth",
-                           this.onSettingGeometryChanged, null);
-		this.settings.bindProperty(Settings.BindingDirection.IN, "settingHeight", "settingHeight",
-                           this.onSettingGeometryChanged, null);
-		this.settings.bindProperty(Settings.BindingDirection.IN, "settingBorderResize", "settingBorderResize",
-                           null, null);
+		this.settings = new Settings.DeskletSettings(this, metadata["uuid"], desklet_id);
+		this.settings.bind("settingKeepRatio", "settingKeepRatio", this.onSettingKeepRatioChanged);
+		this.settings.bind("settingWidth", "settingWidth", this.onSettingGeometryChanged);
+		this.settings.bind("settingHeight", "settingHeight", this.onSettingGeometryChanged);
+		this.settings.bind("settingBorderResize", "settingBorderResize");
 
 		this.window = new St.Bin({reactive: true});
 
