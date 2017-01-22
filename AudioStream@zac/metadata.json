@@ -2,7 +2,8 @@
 	"uuid": "AudioStream@zac",
 	"name": "Audio Stream",
 	"description": "Play audio streams on your desktop",
-	"icon": "audacity",
+	"website": "https://github.com/Zac610/CinnamonMediaDesklets",
+	"contributors": "Code: Sergio Lo Cascio, Icon: Freepik from www.flaticon.com",
 	"prevent-decorations": false,
 	"max-instances": "100",
 	"dangerous": false

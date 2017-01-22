@@ -2,7 +2,6 @@
 	"uuid": "FamilyPortrait@zac",
 	"name": "Family Portrait",
 	"description": "Show images on your desktop",
-	"icon": "users",
 	"website": "https://github.com/Zac610/CinnamonMediaDesklets",
 	"contributors": "Sergio Lo Cascio",
 	"prevent-decorations": false,

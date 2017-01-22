@@ -1,0 +1,15 @@
+{
+	"settingStream":
+	{
+		"type": "entry",
+		"description": "Audio stream to play",
+		"default": "http://ubuntu.hbr1.com:19800/ambient.ogg"
+	},
+	"settingPlayOnStart":
+	{
+		"default": true,
+		"description": "Start playing at startup",
+		"type": "checkbox",
+		"tooltip": "Check this if you want to immediately start the audiostream when your desktop starts"
+	}
+}

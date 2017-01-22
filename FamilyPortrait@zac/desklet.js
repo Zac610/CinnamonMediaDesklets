@@ -5,7 +5,7 @@ const Util = imports.misc.util;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Lang = imports.lang;
-const Signals = imports.signals;
+//~ const Signals = imports.signals;
 const Cinnamon = imports.gi.Cinnamon;
 const Settings = imports.ui.settings;
 
