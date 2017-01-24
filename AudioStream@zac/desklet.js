@@ -66,9 +66,16 @@ ZacDesklet.prototype =
 
 	onButtonPressEvent: function(actor, event)
 	{
-		this.isPlaying = !this.isPlaying;
-		this.setPlaying();
-		return true;
+		//~ let buttonEvent =
+		//~ this.text.set_text("button: " + event.get_button());
+		if (this.isInBox && event.get_button() == 1)
+		{
+			this.isPlaying = !this.isPlaying;
+			this.setPlaying();
+			return true;
+		}
+		else
+		 return false;
 	},
 
 
@@ -94,6 +101,7 @@ ZacDesklet.prototype =
 
 			if (px > xMin && px < xMax && py > yMin && py < yMax)
 			{
+				this.isInBox = true;
 				if (this.isPlaying)
 					global.set_cursor(Cinnamon.Cursor.DND_UNSUPPORTED_TARGET);
 				else
@@ -101,8 +109,9 @@ ZacDesklet.prototype =
 			}
 			else
 			{
+				this.isInBox = false;
 				global.unset_cursor();
-		}
+			}
   },
 
 
