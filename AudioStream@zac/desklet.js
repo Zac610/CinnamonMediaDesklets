@@ -41,8 +41,8 @@ ZacDesklet.prototype =
 		this._clutterBox.add_actor(this._clutterTexture);
 		this.window.add_actor(this._clutterBox);
 
-		this.text = new St.Label();
-		this._clutterBox.add_actor(this.text);
+		this.button = new St.Button();
+		this._clutterBox.add_actor(this.button);
 
 		this.player = new ClutterGst.Playback();
 		this.onSettingStreamChanged();
@@ -50,9 +50,7 @@ ZacDesklet.prototype =
 		this.isPlaying = this.settingPlayOnStart;
 		this.setPlaying();
 
-		this.motionEventId = this.window.connect("motion-event", Lang.bind(this, this.onMotionEvent));
-		this.leaveEventId = this.window.connect("leave-event", Lang.bind(this, this.onLeaveEvent));
-		this.buttonPressEventId = this.window.connect("button-press-event", Lang.bind(this, this.onButtonPressEvent));
+		this.buttonPressEventId = this.button.connect("clicked", Lang.bind(this, this.onButtonPressEvent));
 
 		this.setContent(this.window);
 	},
@@ -66,16 +64,9 @@ ZacDesklet.prototype =
 
 	onButtonPressEvent: function(actor, event)
 	{
-		//~ let buttonEvent =
-		//~ this.text.set_text("button: " + event.get_button());
-		if (this.isInBox && event.get_button() == 1)
-		{
-			this.isPlaying = !this.isPlaying;
-			this.setPlaying();
-			return true;
-		}
-		else
-		 return false;
+		this.isPlaying = !this.isPlaying;
+		this.setPlaying();
+		return true;
 	},
 
 
@@ -83,50 +74,16 @@ ZacDesklet.prototype =
 	{
 		this.player.set_playing(this.isPlaying);
 		if (this.isPlaying)
-			this.text.set_text("play");
+			this.button.set_label('\u25b6');
 		else
-			this.text.set_text("pause");
+			this.button.set_label('\u25ae\u25ae');
 	},
 
-
-	onMotionEvent: function(actor, event)
-	{
-		let box_size = 30;
-		let [mx, my] = event.get_coords();
-		let [ret, px, py] = actor.transform_stage_point(mx, my);
-		let xMin = actor.width / 2 - box_size/2;
-		let xMax = actor.width / 2 + box_size/2;
-		let yMin = actor.height / 2 - box_size/2;
-		let yMax = actor.height / 2 + box_size/2;
-
-			if (px > xMin && px < xMax && py > yMin && py < yMax)
-			{
-				this.isInBox = true;
-				if (this.isPlaying)
-					global.set_cursor(Cinnamon.Cursor.DND_UNSUPPORTED_TARGET);
-				else
-					global.set_cursor(Cinnamon.Cursor.RESIZE_RIGHT);
-			}
-			else
-			{
-				this.isInBox = false;
-				global.unset_cursor();
-			}
-  },
-
-
-	onLeaveEvent: function(actor, event)
-	{
-		global.unset_cursor();
-	},
 
 	on_desklet_removed: function()
 	{
 		this.player.set_playing(false);
-		this.window.disconnect(this.motionEventId);
-		this.window.disconnect(this.leaveEventId);
-		this.window.disconnect(this.buttonPressEventId);
-
+		//this.window.disconnect(this.buttonPressEventId); do I need this?
 	}
 
 }
