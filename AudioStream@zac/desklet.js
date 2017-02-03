@@ -6,8 +6,7 @@ const GLib = imports.gi.GLib;
 const Settings = imports.ui.settings;
 const Lang = imports.lang;
 const Cinnamon = imports.gi.Cinnamon;
-
-ClutterGst.init(null, null);
+const Mainloop = imports.mainloop;
 
 function ZacDesklet(metadata, desklet_id)
 {
@@ -22,6 +21,8 @@ ZacDesklet.prototype =
 	_init: function(metadata, desklet_id)
 	{
 		Desklet.Desklet.prototype._init.call(this, metadata, desklet_id);
+
+		ClutterGst.init(null, null);
 
 		this.settings = new Settings.DeskletSettings(this, metadata["uuid"], desklet_id);
 		this.settings.bind("settingStream", "settingStream", this.onSettingStreamChanged);
@@ -39,6 +40,11 @@ ZacDesklet.prototype =
 		this._clutterBox.set_layout_manager(this._binLayout);
 		this._clutterBox.set_width(this.metadata["width"]);
 		this._clutterBox.add_actor(this._clutterTexture);
+
+		//~ this.text = new St.Label();
+		//~ this.text.set_text("Debug label");
+		//~ this._clutterBox.add_actor(this.text);
+
 		this.window.add_actor(this._clutterBox);
 
 		this.button = new St.Button();
@@ -51,7 +57,8 @@ ZacDesklet.prototype =
 		this.setPlaying();
 
 		this.buttonPressEventId = this.button.connect("clicked", Lang.bind(this, this.onButtonPressEvent));
-
+		//~ this.motionEventId = this.window.connect("motion-event", Lang.bind(this, this.onMotionEvent));
+		this.timeout = Mainloop.timeout_add_seconds(5, Lang.bind(this, this.checkPlayStatus));
 		this.setContent(this.window);
 	},
 
@@ -80,10 +87,31 @@ ZacDesklet.prototype =
 	},
 
 
+	//~ onMotionEvent: function(actor, event)
+	//~ {
+		//~ this.button.set_label('');
+		//~ this.text.set_text(this.player.get_idle()+"_"+this.player.get_playing ()+"\n"
+		//~ );
+	//~ },
+
+
+	checkPlayStatus: function()
+	{
+		if (this.player.get_idle())
+		{
+			this.player.set_playing(false);
+			this.button.set_label('\u2297');
+			if (this.isPlaying)
+				setPlaying(); // retry
+		}
+		return true;
+	},
+
+
 	on_desklet_removed: function()
 	{
 		this.player.set_playing(false);
-		//this.window.disconnect(this.buttonPressEventId); do I need this?
+		Mainloop.source_remove(this.timeout);
 	}
 
 }
